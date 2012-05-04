@@ -8,16 +8,20 @@ class TelnetProtocol(telnet.Telnet):
    #FIXME don't get to attached to this code; protocols.telnet is deprecated
    # this should be re-written using twisted.conch
     def connectionMade(self):
-        log.msg("Incoming connection")
+        log.msg(system="TelnetProtocol", format="Incoming connection")
+        self.factory.clients.append(self)
         telnet.Telnet.connectionMade(self)
 
+    def connectionLost(self, reason):
+        log.msg(system="TelnetProtocol", format="Connection lost, reason: %(reason)s", reason=reason.getErrorMessage())
+        self.factory.clients.remove(self)
+        telnet.Telnet.connectionLost(self)
 
     def checkUserAndPass(self, user, passwd):
         if user == 'robot' and passwd == 'robot':
             self.write("> ")
             return True
         return False
-
 
     def telnet_Command(self, line):
         if line == "js":
