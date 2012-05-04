@@ -16,12 +16,21 @@ class LinkProtocol(protocol.Protocol):
         self._frame = None
 
     def dataReceived(self, data):
+        log.msg("dataReceived: " + data)
         for c in data:
+            if (self._frame and c == LinkFrame.START_BYTE):
+                # Bad frame, restart
+                log.msg("Unexpected start byte")
+                self.handle_badframe(self._frame.raw_data)
+                self._frame = None
             if self._frame:
+                log.msg("self._frame.fill")
                 self._frame.fill(c)
+                log.msg("self.frame.remaining_bytes() = " + str(self._frame.remaining_bytes()))
                 if self._frame.remaining_bytes() == 0:
                     try:
                         # try to parse and return result
+                        log.msg("trying to parse")
                         self._frame.parse()
                         self.handle_packet(self._split_response(self._frame.data))
                     except ValueError:
@@ -30,6 +39,7 @@ class LinkProtocol(protocol.Protocol):
                     self._frame = None
             else:
                 if c == LinkFrame.START_BYTE:
+                    log.msg("c == LinkFrame.START_BYTE")
                     self._frame = LinkFrame()
                     self._frame.fill(c)
 

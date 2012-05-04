@@ -14,18 +14,20 @@ class TelnetProtocol(telnet.Telnet):
 
     def checkUserAndPass(self, user, passwd):
         if user == 'robot' and passwd == 'robot':
+            self.write("> ")
             return True
         return False
 
+
     def telnet_Command(self, line):
         if line == "js":
-            self.factory.service.command_joystick(128, 128)
+            driveservice = self.factory.service.getServiceNamed("driveservice")
+            driveservice.command_joystick(128, 128)
         if line == "exit":
             self.transport.loseConnection()
         if line == "kill":
             reactor.stop()
-        else:
-            self.write(line + "\r\n")
+        self.write("> ")
         return "Command"
     
     def logPrefix(self):
