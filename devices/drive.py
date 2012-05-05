@@ -10,6 +10,21 @@ class Drive:
         self.cal_x_eeprom = 0
         self.cal_y_eeprom = 0
     
+    def command_calibrate_x(self, value):
+        self.driveservice.command_calibrate_x(value)
+
+    def command_calibrate_y(self, value):
+        self.driveservice.command_calibrate_y(value)
+
+    def command_store_calibration(self):
+        self.driveservice.command_store_calibration()
+
+    def command_joystick(self, x, y):
+        self.driveservice.command_joystick(x, y)
+
+    def command_softstop(self):
+        self.driveservice.command_softstop(self)
+        
     def request_calibration(self):
         d = self.driveservice.request_calibration()
         d.addCallback(self.update_calibration)

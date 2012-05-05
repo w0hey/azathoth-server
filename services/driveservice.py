@@ -24,6 +24,25 @@ class DriveService(service.Service):
         self.serial.loseConnection()
         service.Service.stopService(self)
 
+    def command_calibrate_x(self, value):
+        data = '\x40\x00' + chr(value)
+        self.protocol.send(data)
+
+    def command_calibrate_y(self, value):
+        data = '\x40\x01' + chr(value)
+        self.protocol.send(data)
+
+    def command_store_calibration(self):
+        data = '\x40\x10'
+        self.protocol.send(data)
+
+    def command_joystick(self, x, y)
+        data = '\x30' + chr(x) + chr(y)
+        self.protocol.send(data)
+
+    def command_softstop(self):
+        self.protocol.send('\xf0')
+
     def request_calibration(self):
         data = '\x41'
         self.protocol.send(data)
