@@ -2,7 +2,7 @@ from twisted.internet import defer
 
 class Drive:
     def __init__(self, robotservice):
-        self.robotservice = robotservice()
+        self.robotservice = robotservice
         self.driveservice = robotservice.driveservice
         self.cal_x_cur = 0
         self.cal_y_cur = 0
