@@ -8,8 +8,8 @@ from factories.controlfactory import ControlFactory
 
 telnet_port = 2023
 control_port = 2024
-driveport = '/home/steve/COM1'
-ioport = '/home/steve/COM1'
+driveport = '/dev/arduino_A9007MiE'
+ioport = '/dev/arduino_A900ae1d'
 
 top_service = service.MultiService()
 
