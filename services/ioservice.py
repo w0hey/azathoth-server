@@ -39,8 +39,6 @@ class IoService(service.Service):
         pass
 
     def command_lcd_set_position(self, line, column):
-        assert(line == 0 || line == 1)
-        assert(colummn in range(0, 15)
         data = '\x03\x03' + chr(line) + chr(column)
         self.protocol.send(data)
 
