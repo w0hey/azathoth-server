@@ -1,4 +1,5 @@
 from twisted.internet import defer
+from twisted.python import log
 
 class Drive:
     def __init__(self, robotservice):
