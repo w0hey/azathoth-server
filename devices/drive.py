@@ -11,7 +11,7 @@ class Drive:
     
     def request_calibration(self):
         d = self.driveservice.request_calibration()
-        d.addCallBack(self.update_calibration)
+        d.addCallback(self.update_calibration)
         return d
 
     def update_calibration(self, d):

@@ -17,7 +17,7 @@ class ControlProtocol(NetstringReceiver):
         if string[0] == 'c':
             # calibration value request
             d = self.robot.drive.request_calibration()
-            d.addCallBack(self.send_calibration)
+            d.addCallback(self.send_calibration)
 
         elif string[0] == 'C':
             # calibration set command
