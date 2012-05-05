@@ -7,7 +7,7 @@ class DriveProtocol(LinkProtocol):
         LinkProtocol.__init__(self)
 
     def handle_packet(self, packet):
-        if packet[0] = '\x41':
+        if packet[0] == '\x41':
             # calibration response
             x_cur = packet[1]
             y_cur = packet[2]
