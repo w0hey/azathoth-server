@@ -36,4 +36,4 @@ class DriveService(service.Service):
         calibration['current_y'] = y_cur
         calibration['eeprom_x'] = x_eeprom
         calibration['eeprom_y'] = y_eeprom
-        self.calibration.d(calibration)
+        self.calibration_d(calibration)
