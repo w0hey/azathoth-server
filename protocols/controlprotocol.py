@@ -33,7 +33,7 @@ class ControlProtocol(NetstringReceiver):
             ypos = ord(string[2])
             self.robot.drive.command_joystick(xpos, ypos)
         
-    def send_calibration(self, d)
+    def send_calibration(self, d):
         cur_x = d['current_x']
         cur_y = d['current_y']
         eeprom_x = d['eeprom_x']
