@@ -36,7 +36,7 @@ class DriveService(service.Service):
         data = '\x40\x10'
         self.protocol.send(data)
 
-    def command_joystick(self, x, y)
+    def command_joystick(self, x, y):
         data = '\x30' + chr(x) + chr(y)
         self.protocol.send(data)
 
