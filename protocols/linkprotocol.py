@@ -63,7 +63,7 @@ class LinkProtocol(protocol.Protocol):
         # the underlying ZigBee class's _write method.
         # all this code can safely be added to our send() method.
         frame = LinkFrame(data).output()
-        log.msg(format="_writing data: %(data)s", data=frame)
+        log.msg(format="_writing data: %(data)s", data=list(frame))
         self.transport.write(frame)
 
     def _split_response(self, data):
