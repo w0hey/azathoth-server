@@ -8,7 +8,7 @@ from protocols.ioprotocol import IoProtocol
 class IoService(service.Service):
     name = "ioservice"
     def __init__(self, robotservice, port, speed=115200):
-        self.robotservice = robotservice
+        self.robot = robotservice
         self.port = port
         self.speed = speed
     

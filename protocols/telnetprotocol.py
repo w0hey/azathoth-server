@@ -25,8 +25,8 @@ class TelnetProtocol(telnet.Telnet):
 
     def telnet_Command(self, line):
         if line == "js":
-            driveservice = self.factory.service.getServiceNamed("driveservice")
-            driveservice.command_joystick(128, 128)
+            #driveservice = self.factory.service.getServiceNamed("driveservice")
+            #driveservice.command_joystick(128, 128)
         if line == "exit":
             self.transport.loseConnection()
         if line == "kill":

@@ -3,6 +3,7 @@ from twisted.python import log
 
 from services.driveservice import DriveService
 from services.ioservice import IoService
+from services.robotservice import RobotService
 from factories.shellfactory import ShellFactory
 from factories.controlfactory import ControlFactory
 
@@ -13,10 +14,13 @@ ioport = '/dev/arduino_A900ae1d'
 
 top_service = service.MultiService()
 
-drive_service = DriveService(top_service, driveport, 115200)
+robot_service = RobotService(top_service)
+robot_service.setServiceParent(top_service)
+
+drive_service = DriveService(robot_service, driveport, 115200)
 drive_service.setServiceParent(top_service)
 
-io_service = IoService(top_service, ioport, 115200)
+io_service = IoService(robot_service, ioport, 115200)
 io_service.setServiceParent(top_service)
 
 shell_factory = ShellFactory(top_service)
@@ -24,7 +28,7 @@ shell_service = internet.TCPServer(telnet_port, shell_factory)
 shell_service.setName('shellservice')
 shell_service.setServiceParent(top_service)
 
-control_factory = ControlFactory(top_service)
+control_factory = ControlFactory(robot_service)
 control_service = internet.TCPServer(control_port, control_factory)
 control_service.setName('controlservice')
 control_service.setServiceParent(top_service)

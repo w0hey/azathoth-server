@@ -4,6 +4,6 @@ from protocols.controlprotocol import ControlProtocol
 
 class ControlFactory(protocol.ServerFactory):
     protocol = ControlProtocol
-    def __init__(self, service):
+    def __init__(self, robotservice):
         self.clients = []
-        self.service = service
+        self.robot = robotservice

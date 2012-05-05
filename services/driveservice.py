@@ -10,7 +10,7 @@ class DriveService(service.Service):
     def __init__(self, robotservice, port, speed=115200):
         self.port = port
         self.speed = speed
-        self.robotservice = robotservice
+        self.robot = robotservice
 
     def startService(self):
         log.msg("driveservice starting")
