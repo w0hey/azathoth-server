@@ -2,6 +2,7 @@ from twisted.application import service
 from twisted.python import log
 
 from devices.drive import Drive
+from devices.lcd import Lcd
 
 class RobotService(service.Service):
     name = "robotservice"
@@ -16,6 +17,8 @@ class RobotService(service.Service):
         self.controlservice = self.top_service.getServiceNamed('controlservice')
         self.shellservice = self.top_service.getServiceNamed('shellservice')
         self.drive = Drive(self)
+        self.lcd = Lcd(self)
+        self.lcd.clear()
         service.Service.startService(self)
 
     def stopService(self):

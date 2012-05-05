@@ -23,3 +23,27 @@ class IoService(service.Service):
         log.msg("ioservice stopping")
         self.serial.loseConnection()
         service.Service.stopService(self)
+
+    def command_lcd_clear(self):
+        data = '\x03\x00'
+        self.protocol.send(data)
+
+    def command_lcd_set_state(self, enabled):
+        if enabled:
+            data = '\x03\x01\x01'
+        else
+            data = '\x03\x01\x00'
+        self.protocol.send(data)
+
+    def command_lcd_set_backlight(self, value):
+        pass
+
+    def command_lcd_set_position(self, line, column):
+        assert(line == 0 || line == 1)
+        assert(colummn in range(0, 15)
+        data = '\x03\x03' + chr(line) + chr(column)
+        self.protocol.send(data)
+
+    def command_lcd_write(self, chars):
+        data = '\x03\x04' + chars
+        seld.protocol.send(data)
