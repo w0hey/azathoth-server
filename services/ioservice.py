@@ -1,6 +1,7 @@
 from twisted.application import service
 from twisted.internet import reactor
 from twisted.internet.serialport import SerialPort
+from twisted.python import log
 
 from protocols.ioprotocol import IoProtocol
 
