@@ -15,6 +15,7 @@ class Drive:
         return d
 
     def update_calibration(self, d):
+        log(system="Drive", format="update_calibration")
         self.cal_x_cur = d['current_x']
         self.cal_y_cur = d['current_y']
         self.cal_x_eeprom = d['eeprom_x']
