@@ -31,7 +31,7 @@ class IoService(service.Service):
     def command_lcd_set_state(self, enabled):
         if enabled:
             data = '\x03\x01\x01'
-        else
+        else:
             data = '\x03\x01\x00'
         self.protocol.send(data)
 
