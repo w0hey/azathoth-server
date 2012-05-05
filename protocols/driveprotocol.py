@@ -10,10 +10,10 @@ class DriveProtocol(LinkProtocol):
         log.msg(format="Got packet: %(data)s", data=list(packet))
         if packet[0] == '\x41':
             # calibration response
-            x_cur = packet[1]
-            y_cur = packet[2]
-            x_eeprom = packet[3]
-            y_eeprom = packet[4]
+            x_cur = ord(packet[1])
+            y_cur = ord(packet[2])
+            x_eeprom = ord(packet[3])
+            y_eeprom = ord(packet[4])
             self.service.receive_calibration(x_cur, y_cur, x_eeprom, y_eeprom)
 
     def handle_badframe(self, data):
