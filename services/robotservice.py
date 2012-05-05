@@ -18,7 +18,6 @@ class RobotService(service.Service):
         self.shellservice = self.top_service.getServiceNamed('shellservice')
         self.drive = Drive(self)
         self.lcd = Lcd(self)
-        self.lcd.clear()
         service.Service.startService(self)
 
     def stopService(self):

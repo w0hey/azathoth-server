@@ -36,3 +36,5 @@ control_service.setServiceParent(top_service)
 application = service.Application('azathoth')
 
 top_service.setServiceParent(application)
+
+robot_service.lcd.clear()
