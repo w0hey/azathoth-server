@@ -1,4 +1,4 @@
-class lcd:
+class Lcd:
     def __init__(self, robotservice):
         self.robotservice = robotservice
         self.ioservice = robotservice.ioservice
