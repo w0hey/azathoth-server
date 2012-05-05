@@ -31,6 +31,7 @@ class DriveService(service.Service):
         return self.calibration_d
 
     def receive_calibration(self, x_cur, y_cur, x_eeprom, y_eeprom):
+        log.msg("receivied calibration")
         calibration = {}
         calibration['current_x'] = x_cur
         calibration['current_y'] = y_cur
