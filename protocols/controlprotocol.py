@@ -16,7 +16,8 @@ class ControlProtocol(NetstringReceiver):
         log.msg(format="String received: %(string)s", string=string)
         if string[0] == 'c':
             # calibration value request
-            self.robot.drive.request_calibration()
+            d = self.robot.drive.request_calibration()
+            d.addCallBack(self.send_calibration)
 
         elif string[0] == 'C':
             # calibration set command
@@ -31,5 +32,10 @@ class ControlProtocol(NetstringReceiver):
             xpos = ord(string[1])
             ypos = ord(string[2])
             self.robot.drive.command_joystick(xpos, ypos)
-            
+        
+    def send_calibration(self, d)
+        cur_x = d['current_x']
+        cur_y = d['current_y']
+        eeprom_x = d['eeprom_x']
+        eeprom_y = d['eeprom_y']
 

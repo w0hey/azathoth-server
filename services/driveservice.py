@@ -1,5 +1,5 @@
 from twisted.application import service
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.internet.serialport import SerialPort
 from twisted.python import log
 
@@ -23,3 +23,17 @@ class DriveService(service.Service):
         log.msg("driveservice stopping")
         self.serial.loseConnection()
         service.Service.stopService(self)
+
+    def request_calibration(self):
+        data = '\x41'
+        self.protocol.send(data)
+        self.calibration_d = defer.Deferred()
+        return self.calibration_d
+
+    def receive_calibration(self, x_cur, y_cur, x_eeprom, y_eeprom):
+        calibration = {}
+        calibration['current_x'] = x_cur
+        calibration['current_y'] = y_cur
+        calibration['eeprom_x'] = x_eeprom
+        calibration['eeprom_y'] = y_eeprom
+        self.calibration.d(calibration)
