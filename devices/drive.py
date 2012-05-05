@@ -10,7 +10,7 @@ class Drive:
         self.cal_y_eeprom = 0
     
     def request_calibration(self):
-        d = self.driveserice.request_calibration()
+        d = self.driveservice.request_calibration()
         d.addCallBack(self.update_calibration)
         return d
 
