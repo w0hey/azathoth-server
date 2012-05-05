@@ -38,4 +38,6 @@ class ControlProtocol(NetstringReceiver):
         cur_y = d['current_y']
         eeprom_x = d['eeprom_x']
         eeprom_y = d['eeprom_y']
+        data = chr(cur_x) + chr(cur_y) + chr(eeprom_x) + chr(eeprom_y)
+        self.sendString(data)
 
