@@ -9,10 +9,10 @@ class RobotService(service.Service):
 
     def startService(self):
         log.msg("robotservice starting")
-        self.driveservice = top_service.getServiceNamed('driveservice')
-        self.ioservice = top_service.getServiceNamed('ioservice')
-        self.controlservice = top_service.getServiceNamed('controlservice')
-        self.shellservice = top_service.getServiceNamed('shellservice')
+        self.driveservice = self.top_service.getServiceNamed('driveservice')
+        self.ioservice = self.top_service.getServiceNamed('ioservice')
+        self.controlservice = self.top_service.getServiceNamed('controlservice')
+        self.shellservice = self.top_service.getServiceNamed('shellservice')
         service.Service.startService(self)
 
     def stopService(self):
