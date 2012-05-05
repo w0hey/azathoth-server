@@ -6,13 +6,13 @@ class RobotService(service.Service):
     
     def __init__(self, top_service):
         self.top_service = top_service
+
+    def startService(self):
+        log.msg("robotservice starting")
         self.driveservice = top_service.getServiceNamed('driveservice')
         self.ioservice = top_service.getServiceNamed('ioservice')
         self.controlservice = top_service.getServiceNamed('controlservice')
         self.shellservice = top_service.getServiceNamed('shellservice')
-    
-    def startService(self):
-        log.msg("robotservice starting")
         service.Service.startService(self)
 
     def stopService(self):
