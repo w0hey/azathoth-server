@@ -19,3 +19,4 @@ class Drive:
         self.cal_y_cur = d['current_y']
         self.cal_x_eeprom = d['eeprom_x']
         self.cal_y_eeprom = d['eeprom_y']
+        return d
