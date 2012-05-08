@@ -25,7 +25,7 @@ class TelnetProtocol(telnet.Telnet):
 
     def telnet_Command(self, line):
         if line == "lcd":
-            self.write("lcd> ")
+            self.write("lcd > ")
             return "Lcd"
         if line == "exit":
             self.transport.loseConnection()
@@ -41,7 +41,7 @@ class TelnetProtocol(telnet.Telnet):
         if line == "clear":
            self.factory.robot.lcd.clear()
            self.write("lcd > ")
-        self.write("lcd > "
+        self.write("lcd > ")
         return "Lcd"
     
     def logPrefix(self):
