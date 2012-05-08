@@ -40,7 +40,8 @@ class TelnetProtocol(telnet.Telnet):
             return "Command"
         if line == "clear":
            self.factory.robot.lcd.clear()
-           self.write("> ")
+           self.write("lcd > ")
+        self.write("lcd > "
         return "Lcd"
     
     def logPrefix(self):
