@@ -13,15 +13,15 @@ class DriveService(service.Service):
         self.topservice = topservice
 
     def startService(self):
-        log.msg("driveservice starting")
+        log.msg(system='DriveService', format="service starting")
         self.protocol = DriveProtocol(self)
-        log.msg(format="driveservice opening serial port %(port)s", port=self.port)
+        log.msg(system='DriveService', format="opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
         self.robotservice = self.topservice.getServiceNamed('robotservice')
         service.Service.startService(self)
     
     def stopService(self):
-        log.msg("driveservice stopping")
+        log.msg(system='DriveService', format="service stopping")
         self.serial.loseConnection()
         service.Service.stopService(self)
 
@@ -51,7 +51,7 @@ class DriveService(service.Service):
         return self.calibration_d
 
     def receive_calibration(self, x_cur, y_cur, x_eeprom, y_eeprom):
-        log.msg("receivied calibration")
+        log.msg(system='DriveService' format="receivied calibration values")
         calibration = {}
         calibration['current_x'] = x_cur
         calibration['current_y'] = y_cur

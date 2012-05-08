@@ -13,15 +13,15 @@ class IoService(service.Service):
         self.speed = speed
     
     def startService(self):
-        log.msg("ioservice starting")
+        log.msg(system='IoService' format="service starting")
         self.protocol = IoProtocol(self)
-        log.msg(format="ioservice opening serial port %(port)s", port=self.port)
+        log.msg(system='IoService', format="opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
         self.robotservice = self.topservice.getServiceNamed('robotservice')
         service.Service.startService(self)
 
     def stopService(self):
-        log.msg("ioservice stopping")
+        log.msg(system='IoService' format="service stopping")
         self.serial.loseConnection()
         service.Service.stopService(self)
 

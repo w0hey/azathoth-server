@@ -20,17 +20,14 @@ class LinkProtocol(protocol.Protocol):
         for c in data:
             if (self._frame and c == LinkFrame.START_BYTE):
                 # Bad frame, restart
-                log.msg("Unexpected start byte")
+                log.err(system='LinkProtocol', format="Unexpected start byte")
                 self.handle_badframe(self._frame.raw_data)
                 self._frame = None
             if self._frame:
-                log.msg("self._frame.fill")
                 self._frame.fill(c)
-                log.msg("self.frame.remaining_bytes() = " + str(self._frame.remaining_bytes()))
                 if self._frame.remaining_bytes() == 0:
                     try:
                         # try to parse and return result
-                        log.msg("trying to parse")
                         self._frame.parse()
                         self.handle_packet(self._split_response(self._frame.data))
                     except ValueError:
@@ -39,7 +36,6 @@ class LinkProtocol(protocol.Protocol):
                     self._frame = None
             else:
                 if c == LinkFrame.START_BYTE:
-                    log.msg("c == LinkFrame.START_BYTE")
                     self._frame = LinkFrame()
                     self._frame.fill(c)
 
@@ -62,8 +58,8 @@ class LinkProtocol(protocol.Protocol):
         # TODO: This method is spurious, in txXBee is overrides
         # the underlying ZigBee class's _write method.
         # all this code can safely be added to our send() method.
-        frame = LinkFrame(data).output()
-        log.msg(format="_writing data: %(data)s", data=list(frame))
+        frame = map(hex, LinkFrame(data).output())
+        log.msg(system='LinkProtocol', format="_writing data: %(data)s", data=list(frame))
         self.transport.write(frame)
 
     def _split_response(self, data):
