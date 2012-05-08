@@ -28,3 +28,6 @@ pip-log.txt
 
 # Vim swap files
 *.swp
+
+# Twisted pid file
+twistd.pid
