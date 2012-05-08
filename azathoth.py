@@ -14,14 +14,14 @@ ioport = '/dev/arduino_A900ae1d'
 
 top_service = service.MultiService()
 
-robot_service = RobotService(top_service)
-robot_service.setServiceParent(top_service)
-
-drive_service = DriveService(robot_service, driveport, 115200)
+drive_service = DriveService(top_service, driveport, 115200)
 drive_service.setServiceParent(top_service)
 
-io_service = IoService(robot_service, ioport, 115200)
+io_service = IoService(top_service, ioport, 115200)
 io_service.setServiceParent(top_service)
+
+robot_service = RobotService(top_service)
+robot_service.setServiceParent(top_service)
 
 shell_factory = ShellFactory(top_service)
 shell_service = internet.TCPServer(telnet_port, shell_factory)

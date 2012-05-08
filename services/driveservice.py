@@ -7,16 +7,17 @@ from protocols.driveprotocol import DriveProtocol
 
 class DriveService(service.Service):
     name = "driveservice"
-    def __init__(self, robotservice, port, speed=115200):
+    def __init__(self, topservice, port, speed=115200):
         self.port = port
         self.speed = speed
-        self.robot = robotservice
+        self.topservice = topservice
 
     def startService(self):
         log.msg("driveservice starting")
         self.protocol = DriveProtocol(self)
         log.msg(format="driveservice opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
+        self.robotservice = self.topservice.getServiceNamed('robotservice')
         service.Service.startService(self)
     
     def stopService(self):

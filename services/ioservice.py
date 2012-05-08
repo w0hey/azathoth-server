@@ -7,8 +7,8 @@ from protocols.ioprotocol import IoProtocol
 
 class IoService(service.Service):
     name = "ioservice"
-    def __init__(self, robotservice, port, speed=115200):
-        self.robot = robotservice
+    def __init__(self, topservice, port, speed=115200):
+        self.topservice = topservice
         self.port = port
         self.speed = speed
     
@@ -17,6 +17,7 @@ class IoService(service.Service):
         self.protocol = IoProtocol(self)
         log.msg(format="ioservice opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
+        self.robotservice = self.topservice.getServiceNamed('robotservice')
         service.Service.startService(self)
 
     def stopService(self):
