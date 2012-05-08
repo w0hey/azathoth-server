@@ -24,16 +24,24 @@ class TelnetProtocol(telnet.Telnet):
         return False
 
     def telnet_Command(self, line):
-        if line == "js":
-            #driveservice = self.factory.service.getServiceNamed("driveservice")
-            #driveservice.command_joystick(128, 128)
-            pass
+        if line == "lcd":
+            self.write("lcd> ")
+            return "Lcd"
         if line == "exit":
             self.transport.loseConnection()
         if line == "kill":
             reactor.stop()
         self.write("> ")
         return "Command"
+
+    def telnet_Lcd(self, line):
+        if line == "exit":
+            self.write("> ")
+            return "Command"
+        if line == "clear"
+           self.factory.robot.lcd.clear()
+           self.write("> ")
+        return "Lcd"
     
     def logPrefix(self):
         return "TelnetProtocol"
