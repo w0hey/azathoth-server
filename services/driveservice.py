@@ -54,8 +54,8 @@ class DriveService(service.Service):
     def onReceiveCalibration(self, data):
         log.msg(system='DriveService', format="receivied calibration values")
         calibration = {}
-        calibration['current_x'] = data[0]
-        calibration['current_y'] = data[1]
-        calibration['eeprom_x'] = data[2]
-        calibration['eeprom_y'] = data[3]
+        calibration['current_x'] = ord(data[0])
+        calibration['current_y'] = ord(data[1])
+        calibration['eeprom_x'] = ord(data[2])
+        calibration['eeprom_y'] = ord(data[3])
         self.calibration_d.callback(calibration)

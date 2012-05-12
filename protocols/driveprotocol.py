@@ -15,7 +15,7 @@ class DriveProtocol(LinkProtocol):
 
     def handle_packet(self, packet):
         log.msg(system='DriveProtocol', format="Got packet: %(data)s", data=list(packet))
-        cmd = packet[0]
+        cmd = ord(packet[0])
         if cmd in self.callbacks:
             self.callbacks[cmd](packet[1:])
         else:
