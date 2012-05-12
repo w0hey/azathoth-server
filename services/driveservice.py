@@ -18,6 +18,7 @@ class DriveService(service.Service):
         log.msg(system='DriveService', format="opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
         self.robotservice = self.topservice.getServiceNamed('robotservice')
+        self.protocol.register_callbacks('0x41', self.onReceiveCalibration)
         service.Service.startService(self)
     
     def stopService(self):
@@ -50,11 +51,11 @@ class DriveService(service.Service):
         self.calibration_d = defer.Deferred()
         return self.calibration_d
 
-    def receive_calibration(self, x_cur, y_cur, x_eeprom, y_eeprom):
+    def onReceiveCalibration(self, data):
         log.msg(system='DriveService', format="receivied calibration values")
         calibration = {}
-        calibration['current_x'] = x_cur
-        calibration['current_y'] = y_cur
-        calibration['eeprom_x'] = x_eeprom
-        calibration['eeprom_y'] = y_eeprom
+        calibration['current_x'] = data[0]
+        calibration['current_y'] = data[1]
+        calibration['eeprom_x'] = data[2]
+        calibration['eeprom_y'] = data[3]
         self.calibration_d.callback(calibration)
