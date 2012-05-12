@@ -18,7 +18,7 @@ class DriveService(service.Service):
         log.msg(system='DriveService', format="opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
         self.robotservice = self.topservice.getServiceNamed('robotservice')
-        self.protocol.register_callbacks('0x41', self.onReceiveCalibration)
+        self.protocol.register_callback('0x41', self.onReceiveCalibration)
         service.Service.startService(self)
     
     def stopService(self):
