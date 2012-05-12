@@ -19,7 +19,7 @@ class DriveProtocol(LinkProtocol):
         data = map(ord, packet)
         cmd = data[0]
         if cmd in self.callbacks:
-            self.callbacks[cmd](packet[1:])
+            self.callbacks[cmd](data[1:])
         else:
             log.msg(system='DriveProtocol', format="No callback for command: %(cmd)s", cmd=cmd)
         #if packet[0] == '\x41':
