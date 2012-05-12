@@ -14,9 +14,9 @@ class DriveProtocol(LinkProtocol):
         del self.callbacks[cmd]
 
     def handle_packet(self, packet):
-        log.msg(system='DriveProtocol', format="Got packet: %(data)s", data=list(packet))
         # let's fix this data here and now.
         data = map(ord, packet)
+        log.msg(system='DriveProtocol', format="Got packet: %(data)s", data=map(hex,data))
         cmd = data[0]
         if cmd in self.callbacks:
             self.callbacks[cmd](data[1:])
@@ -31,4 +31,4 @@ class DriveProtocol(LinkProtocol):
         #    self.service.receive_calibration(x_cur, y_cur, x_eeprom, y_eeprom)
 
     def handle_badframe(self, data):
-        log.err(system='DriveProtocol', format="bad frame received: %(data)s", data=data)
+        log.err(system='DriveProtocol', format="bad frame received: %(data)s", data=map(hex,map(ord,data)))
