@@ -7,18 +7,23 @@ from protocols.driveprotocol import DriveProtocol
 
 class DriveService(service.Service):
     name = "driveservice"
-    def __init__(self, topservice, port, speed=115200):
+    def __init__(self, port, speed=115200):
         self.port = port
         self.speed = speed
-        self.topservice = topservice
+        self.cal_x_cur = 0
+        self.cal_y_cur = 0
+        self.cal_x_eeprom = 0
+        self.cal_y_eeprom = 0
 
     def startService(self):
         log.msg(system='DriveService', format="service starting")
         self.protocol = DriveProtocol(self)
         log.msg(system='DriveService', format="opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
-        self.robotservice = self.topservice.getServiceNamed('robotservice')
+        self.protocol.register_callback(0x01, self.onHandshake)
         self.protocol.register_callback(0x41, self.onReceiveCalibration)
+        self.protocol.register_callback(0x42, self.onReceiveStatus)
+        self.protocol.register_callback(0xee, self.onDriveError)
         service.Service.startService(self)
     
     def stopService(self):
@@ -51,6 +56,19 @@ class DriveService(service.Service):
         self.calibration_d = defer.Deferred()
         return self.calibration_d
 
+    def onHandshake(self, data):
+        log.msg(system='DriveService', format="Controller is alive")
+
+    def onDriveError(self, data):
+        log.msg(system='DriveService', format="Controller error, code %(code)#x", code=data[0])
+
+    def onReceiveStatus(self, data):
+        status = data[0];
+        xpos = data[1];
+        ypos = data[2];
+        xval = data[3];
+        yval = data[4];
+
     def onReceiveCalibration(self, data):
         log.msg(system='DriveService', format="receivied calibration values")
         calibration = {}
@@ -58,4 +76,10 @@ class DriveService(service.Service):
         calibration['current_y'] = data[1]
         calibration['eeprom_x'] = data[2]
         calibration['eeprom_y'] = data[3]
-        self.calibration_d.callback(calibration)
+        self.cal_x_cur = data[0]
+        self.cal_y_cur = data[1]
+        self.cal_x_eeprom = data[2]
+        self.cal_y_eeprom = data[3]
+        if self.calibration_d is not None:
+            self.calibration_d.callback(calibration)
+            self.calibration_d = None

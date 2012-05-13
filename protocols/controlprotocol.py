@@ -16,7 +16,7 @@ class ControlProtocol(NetstringReceiver):
         log.msg(format="String received: %(string)s", string=string)
         if string[0] == 'c':
             # calibration value request
-            d = self.robot.drive.request_calibration()
+            d = self.robot.driveservice.request_calibration()
             d.addCallback(self.send_calibration)
 
         elif string[0] == 'C':
@@ -24,22 +24,22 @@ class ControlProtocol(NetstringReceiver):
             log.msg("got calibration command")
             x = ord(string[1])
             y = ord(string[2])
-            self.robot.drive.command_calibrate_x(x)
-            self.robot.drive.command_calibrate_y(y)
+            self.robot.driveservice.command_calibrate_x(x)
+            self.robot.driveservice.command_calibrate_y(y)
 
         elif string[0] == 'J':
             # Joystick position command
             xpos = ord(string[1])
             ypos = ord(string[2])
-            self.robot.drive.command_joystick(xpos, ypos)
+            self.robot.driveservice.command_joystick(xpos, ypos)
         
         elif string[0] == 'S':
             # soft stop command
-            self.robot.drive.command_softstop()
+            self.robot.driveservice.command_softstop()
 
         elif string[0] == 'W':
             # calibration store command
-            self.robot.drive.command_store_calibration()
+            self.robot.driveservice.command_store_calibration()
         
     def send_calibration(self, d):
         log.msg(system="ControlProtocol", format="send_calibration, data=%(data)s", data=d)
