@@ -9,7 +9,7 @@ class ControlProtocol(NetstringReceiver):
         self.robot = self.factory.robot
 
     def connectionLost(self, reason):
-        log.msg(format="Lost connection, reason: %(reason)s", reason=reason)
+        log.msg(format="Lost connection, reason: %(reason)s", reason=reason.getErrorMessage())
         self.factory.clients.remove(self)
 
     def stringReceived(self, string):
