@@ -16,7 +16,7 @@ class LinkProtocol(protocol.Protocol):
         self._frame = None
 
     def dataReceived(self, data):
-        log.msg("dataReceived: " + data)
+        #log.msg("dataReceived: " + data)
         for c in data:
             if (self._frame and c == LinkFrame.START_BYTE):
                 # Bad frame, restart
