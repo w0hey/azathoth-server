@@ -20,7 +20,7 @@ robot_service.setServiceParent(top_service)
 drive_service = DriveService(driveport, 115200)
 drive_service.setServiceParent(robot_service)
 
-io_service = IoService(top_service, ioport, 115200)
+io_service = IoService(ioport, 115200)
 io_service.setServiceParent(robot_service)
 
 shell_factory = ShellFactory(top_service)

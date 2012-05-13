@@ -39,7 +39,7 @@ class TelnetProtocol(telnet.Telnet):
             self.write("> ")
             return "Command"
         if line == "clear":
-           self.factory.robot.lcd.clear()
+           self.factory.robot.io.lcd.clear()
         self.write("lcd > ")
         return "Lcd"
     

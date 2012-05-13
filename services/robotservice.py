@@ -13,11 +13,10 @@ class RobotService(service.MultiService):
     def startService(self):
         log.msg(system='RobotService', format="service starting")
         service.MultiService.startService(self)
-        self.driveservice = self.getServiceNamed('driveservice')
-        self.ioservice = self.getServiceNamed('ioservice')
+        self.drive = self.getServiceNamed('driveservice')
+        self.io = self.getServiceNamed('ioservice')
         self.controlservice = self.top_service.getServiceNamed('controlservice')
         self.shellservice = self.top_service.getServiceNamed('shellservice')
-        self.lcd = Lcd(self)
 
     def stopService(self):
         log.msg(system='RobotService', format="service stopping")

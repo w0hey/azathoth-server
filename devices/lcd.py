@@ -1,19 +1,25 @@
 class Lcd:
-    def __init__(self, robotservice):
-        self.robotservice = robotservice
-        self.ioservice = robotservice.ioservice
+    def __init__(self, ioservice):
+        self.ioservice = ioservice
     
     def clear(self):
-        self.ioservice.command_lcd_clear()
+        data = '\x03\x00'
+        self.ioservice.protocol.send(data)
 
     def set_display_enabled(self, enabled):
-        self.ioservice.command_lcd_set_state(enabled)
+        if enabled:
+            data = '\x03\x01\x01'
+        else:
+            data = '\x03\x01\x00'
+        self.ioservice.protocol.send(data)
 
     def set_backlight(self, value):
         pass
 
     def set_pos(self, line, column):
-        self.ioservice.command_lcd_set_position(line, column)
+        data = '\x03\x03' + chr(line) + chr(column)
+        self.ioservice.protocol.send(data)
 
     def write(self, chars):
-        self.ioservice.command_lcd_write(chars)
+        data = '\x03\x04' + chars
+        self.ioservice.protocol.send(data)
