@@ -71,5 +71,5 @@ class LinkProtocol(protocol.Protocol):
         This method passes the provided data to _write() to be framed
         as a packet and sent over the wire.
         """
-        log.msg(system='LinkProtocol', format="Sending frame: %(data)s", data=map(hex,map(ord(list(frame))))) #yikes
+        log.msg(system='LinkProtocol', format="Sending frame: %(data)s", data=map(hex,map(ord(list(data))))) #yikes
         self._write(data)
