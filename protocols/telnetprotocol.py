@@ -31,6 +31,8 @@ class TelnetProtocol(telnet.Telnet):
             self.transport.loseConnection()
         if line == "kill":
             reactor.stop()
+        else:
+            self.write("lcd exit kill\r\n")
         self.write("> ")
         return "Command"
 
@@ -40,6 +42,8 @@ class TelnetProtocol(telnet.Telnet):
             return "Command"
         if line == "clear":
            self.factory.robot.io.lcd.clear()
+        else:
+            self.write("clear exit\r\n")
         self.write("lcd > ")
         return "Lcd"
     
