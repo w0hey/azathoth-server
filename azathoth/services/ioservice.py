@@ -3,8 +3,8 @@ from twisted.internet import reactor
 from twisted.internet.serialport import SerialPort
 from twisted.python import log
 
-from protocols.ioprotocol import IoProtocol
-from devices.lcd import Lcd
+from azathoth.protocols.ioprotocol import IoProtocol
+from azathoth.devices.lcd import Lcd
 
 class IoService(service.Service):
     name = "ioservice"

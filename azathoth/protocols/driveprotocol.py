@@ -1,5 +1,6 @@
 from twisted.python import log
-from protocols.linkprotocol import LinkProtocol
+
+from azathoth.protocols.linkprotocol import LinkProtocol
 
 class DriveProtocol(LinkProtocol):
     def __init__(self, service):

@@ -1,6 +1,6 @@
 from twisted.internet import protocol
 
-from protocols.telnetprotocol import TelnetProtocol
+from azathoth.protocols.telnetprotocol import TelnetProtocol
 
 class ShellFactory(protocol.ServerFactory):
     protocol = TelnetProtocol

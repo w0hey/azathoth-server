@@ -1,6 +1,6 @@
 from twisted.internet import protocol
 
-from protocols.controlprotocol import ControlProtocol
+from azathoth.protocols.controlprotocol import ControlProtocol
 
 class ControlFactory(protocol.ServerFactory):
     protocol = ControlProtocol

@@ -1,4 +1,4 @@
-from protocols.linkprotocol import LinkProtocol
+from azathoth.protocols.linkprotocol import LinkProtocol
 
 class IoProtocol(LinkProtocol):
     def __init__(self, service):

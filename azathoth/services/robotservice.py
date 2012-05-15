@@ -1,7 +1,7 @@
 from twisted.application import service
 from twisted.python import log
 
-from devices.lcd import Lcd
+from azathoth.devices.lcd import Lcd
 
 class RobotService(service.MultiService):
     name = "robotservice"

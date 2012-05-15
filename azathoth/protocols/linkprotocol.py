@@ -1,7 +1,7 @@
 from twisted.internet import protocol
 from twisted.python import log
 
-from protocols.linkframe import LinkFrame
+from azathoth.protocols.linkframe import LinkFrame
 
 class LinkProtocol(protocol.Protocol):
     """

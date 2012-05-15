@@ -1,5 +1,6 @@
 import struct
-from protocols.python2to3 import byteToInt, intToByte
+
+from azathoth.protocols.python2to3 import byteToInt, intToByte
 
 
 class LinkFrame:

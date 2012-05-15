@@ -3,7 +3,7 @@ from twisted.internet import reactor, defer
 from twisted.internet.serialport import SerialPort
 from twisted.python import log
 
-from protocols.driveprotocol import DriveProtocol
+from azathoth.protocols.driveprotocol import DriveProtocol
 
 class DriveService(service.Service):
     name = "driveservice"
