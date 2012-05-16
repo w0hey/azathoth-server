@@ -18,10 +18,18 @@ class IoService(service.Service):
         log.msg(system='IoService', format="opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
         self.lcd = Lcd(self)
+        self.protocol.register_callback(0x01, self.onHandshake)
+        self.protocol.register_callback(0xee, self.onIoError)
         service.Service.startService(self)
 
     def stopService(self):
         log.msg(system='IoService', format="service stopping")
         self.serial.loseConnection()
         service.Service.stopService(self)
+
+    def onHandshake(self, data):
+        log.msg(system='IoService', format="Controller is alive") 
+
+    def onIoError(self, data):
+        log.msg(system='IoService', format="Controller error, code %(code)#x", code=data[0])
 
