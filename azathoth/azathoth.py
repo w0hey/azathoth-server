@@ -7,14 +7,6 @@ from services.robotservice import RobotService
 from factories.shellfactory import ShellFactory
 from factories.controlfactory import ControlFactory
 
-DEFAULT_TELNETPORT = 2023
-DEFAULT_CONTROLPORT = 2024
-DEFAULT_DRIVEDEVICE = '/dev/arduino_A9007MiE'
-DEFAULY_IODEVICE = '/dev/arduino_A900ae1d'
-
-class Options(usage.Options):
-    optParameters = [["port", "p", DEFAULT_CONTROLPORT,
-                      "The port number to listen on."]]
 
 telnet_port = 2023
 control_port = 2024
