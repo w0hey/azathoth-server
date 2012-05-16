@@ -50,3 +50,11 @@ class ControlProtocol(NetstringReceiver):
         data = 'c' + chr(cur_x) + chr(cur_y) + chr(eeprom_x) + chr(eeprom_y)
         self.sendString(data)
 
+    def send_status(self, status, xpos, ypos, xvalue, yvalue):
+        data = 's' + map(chr, [status, xpos, ypos, xvalue, yvalue])
+        self.sendString(data)
+
+    def send_error(self, source, error):
+        # TODO
+        pass
+
