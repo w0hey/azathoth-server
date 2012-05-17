@@ -58,13 +58,13 @@ class DriveService(service.Service):
 
     def onHandshake(self, data):
         log.msg(system='DriveService', format="Controller is alive")
-        handlers = parent.getHandlers('DRV_HANDSHAKE')
+        handlers = self.parent.getHandlers('DRV_HANDSHAKE')
         for h in handlers:
             h()
 
     def onDriveError(self, data):
         log.msg(system='DriveService', format="Controller error, code %(code)#x", code=data[0])
-        handlers = parent.getHandlers('DRV_ERROR')
+        handlers = self.parent.getHandlers('DRV_ERROR')
         for h in handlers:
             h(data[0])
 
@@ -74,7 +74,7 @@ class DriveService(service.Service):
         ypos = data[2];
         xval = data[3];
         yval = data[4];
-        handlers = parent.getHandlers('DRV_STATUS')
+        handlers = self.parent.getHandlers('DRV_STATUS')
         for h in handlers:
             h(status, xpos, ypos, xval, yval)
 
