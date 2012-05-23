@@ -31,12 +31,8 @@ class DriveService(service.Service):
         self.serial.loseConnection()
         service.Service.stopService(self)
 
-    def command_calibrate_x(self, value):
-        data = '\x40\x00' + chr(value)
-        self.protocol.send(data)
-
-    def command_calibrate_y(self, value):
-        data = '\x40\x01' + chr(value)
+    def command_calibrate(self, xvalue, yvalue):
+        data = '\x40\x00' + chr(xvalue) + chr(yvalue)
         self.protocol.send(data)
 
     def command_store_calibration(self):
