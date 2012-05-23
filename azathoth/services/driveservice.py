@@ -47,8 +47,22 @@ class DriveService(service.Service):
         data = '\x30' + chr(x) + chr(y)
         self.protocol.send(data)
 
+    def command_select(self, enable):
+        if enable:
+            data = '\x43\x01'
+            self.protocol.send(data)
+        else:
+            data = '\x43\x00'
+            self.protocol.send(data)
+
     def command_softstop(self):
         self.protocol.send('\xf0')
+
+    def command_estop(self):
+        self.protocol.send('\xff')
+
+    def command_reset(self):
+        self.protocol.send('\xfe')
 
     def request_calibration(self):
         data = '\x41'

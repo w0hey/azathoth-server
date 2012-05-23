@@ -7,6 +7,7 @@ class ControlProtocol(NetstringReceiver):
         log.msg("Got connection")
         self.factory.clients.append(self)
         self.robot = self.factory.robot
+        self.robot.addHandler('DRV_STATUS', self.send_status)
 
     def connectionLost(self, reason):
         log.msg(format="Lost connection, reason: %(reason)s", reason=reason.getErrorMessage())
@@ -24,14 +25,28 @@ class ControlProtocol(NetstringReceiver):
             log.msg("got calibration command")
             x = ord(string[1])
             y = ord(string[2])
-            self.robot.drive.command_calibrate_x(x)
-            self.robot.drive.command_calibrate_y(y)
+            self.robot.drive.command_calibrate(x, y)
 
         elif string[0] == 'J':
             # Joystick position command
             xpos = ord(string[1])
             ypos = ord(string[2])
             self.robot.drive.command_joystick(xpos, ypos)
+
+        elif string[0] == 'D':
+            # Drive select command
+            if string[1] == '\x00':
+                self.robot.drive.command_select(False)
+            elif string[1] == 'x01':
+                self.robot.drive.command_select(True)
+
+        elif string[0] == 'E':
+            # E-stop
+            self.robot.drive.command_estop()
+
+        elif string[0] == 'R':
+            # Reset E-stop
+            self.robot.drive.command_reset()
         
         elif string[0] == 'S':
             # soft stop command
