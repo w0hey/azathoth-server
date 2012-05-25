@@ -66,7 +66,7 @@ class ControlProtocol(NetstringReceiver):
         self.sendString(data)
 
     def send_status(self, status, xpos, ypos, xvalue, yvalue):
-        data = 's' + map(chr, [status, xpos, ypos, xvalue, yvalue])
+        data = 's' + chr(status) + chr(xpos) + chr(ypos) +chr(xvalue) + chr(yvalue)
         self.sendString(data)
 
     def send_error(self, source, error):
