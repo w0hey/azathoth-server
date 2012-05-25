@@ -37,7 +37,7 @@ class ControlProtocol(NetstringReceiver):
             # Drive select command
             if string[1] == '\x00':
                 self.robot.drive.command_select(False)
-            elif string[1] == 'x01':
+            elif string[1] == '\x01':
                 self.robot.drive.command_select(True)
 
         elif string[0] == 'E':
