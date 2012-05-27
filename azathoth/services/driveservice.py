@@ -3,7 +3,7 @@ from twisted.internet import reactor, defer
 from twisted.internet.serialport import SerialPort
 from twisted.python import log
 
-from azathoth.protocols.driveprotocol import DriveProtocol
+from azathoth.protocols.controllerprotocol import ControllerProtocol
 
 class DriveService(service.Service):
     name = "driveservice"
@@ -17,7 +17,7 @@ class DriveService(service.Service):
 
     def startService(self):
         log.msg(system='DriveService', format="service starting")
-        self.protocol = DriveProtocol(self)
+        self.protocol = ControllerProtocol(self)
         log.msg(system='DriveService', format="opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
         self.protocol.register_callback(0x01, self.onHandshake)
