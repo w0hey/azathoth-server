@@ -3,23 +3,16 @@ class Lcd:
         self.ioservice = ioservice
     
     def clear(self):
-        data = '\x03\x00'
-        self.ioservice.protocol.send(data)
+        self.ioservice.protocol.lcd_cmd_clear()
 
-    def set_display_enabled(self, enabled):
-        if enabled:
-            data = '\x03\x01\x01'
-        else:
-            data = '\x03\x01\x00'
-        self.ioservice.protocol.send(data)
+    def setEnabled(self, enabled):
+        self.ioservice.protocol.lcd_cmd_set_enabled(enabled)
 
-    def set_backlight(self, value):
-        pass
+    def setBacklight(self, value):
+        self.ioservice.protocol.lcd_cmd_set_backlight(value)
 
-    def set_pos(self, line, column):
-        data = '\x03\x03' + chr(line) + chr(column)
-        self.ioservice.protocol.send(data)
+    def setPos(self, line, column):
+        self.ioservice.protocol.lcd_cmd_set_position(line, column)
 
-    def write(self, chars):
-        data = '\x03\x04' + chars
-        self.ioservice.protocol.send(data)
+    def writeChars(self, chars):
+        self.ioservice.protocol.lcd_cmd_write(chars)

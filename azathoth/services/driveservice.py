@@ -3,7 +3,7 @@ from twisted.internet import reactor, defer
 from twisted.internet.serialport import SerialPort
 from twisted.python import log
 
-from azathoth.protocols.controllerprotocol import ControllerProtocol
+from azathoth.protocols.driveprotocol import DriveProtocol
 
 class DriveService(service.Service):
     name = "driveservice"
@@ -17,13 +17,13 @@ class DriveService(service.Service):
 
     def startService(self):
         log.msg(system='DriveService', format="service starting")
-        self.protocol = ControllerProtocol(self)
+        self.protocol = DriveProtocol(self)
         log.msg(system='DriveService', format="opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
-        self.protocol.register_callback(0x01, self.onHandshake)
-        self.protocol.register_callback(0x41, self.onReceiveCalibration)
-        self.protocol.register_callback(0x42, self.onReceiveStatus)
-        self.protocol.register_callback(0xee, self.onDriveError)
+        self.protocol.register_callback(0x01, self._onHandshake)
+        self.protocol.register_callback(0x41, self._onReceiveCalibration)
+        self.protocol.register_callback(0x42, self._onReceiveStatus)
+        self.protocol.register_callback(0xee, self._onDriveError)
         service.Service.startService(self)
     
     def stopService(self):
@@ -31,64 +31,52 @@ class DriveService(service.Service):
         self.serial.loseConnection()
         service.Service.stopService(self)
 
-    def command_calibrate(self, xvalue, yvalue):
-        data = '\x40\x00' + chr(xvalue) + chr(yvalue)
-        self.protocol.send(data)
+    def setMode(self, mode):
+        self.protocol.cmd_mode(mode)
 
-    def command_store_calibration(self):
-        data = '\x40\x10'
-        self.protocol.send(data)
+    def directJoystick(self, xpos, ypos):
+        self.protocol.cmd_joystick(xpos, ypos)
 
-    def command_joystick(self, x, y):
-        data = '\x30' + chr(x) + chr(y)
-        self.protocol.send(data)
+    def setCalibration(self, xvalue, yvalue):
+        self.protocol.cmd_calibrate_set(xvalue, yvalue)
 
-    def command_select(self, enable):
-        if enable:
-            data = '\x43\x01'
-            self.protocol.send(data)
-        else:
-            data = '\x43\x00'
-            self.protocol.send(data)
+    def storeCalibration(self):
+        self.protocol.cmd_calibrate_store()
 
-    def command_softstop(self):
-        self.protocol.send('\xf0')
+    def driveSelect(self, enable):
+        self.protocol.cmd_driveselect(enable)
 
-    def command_estop(self):
-        self.protocol.send('\xff')
+    def stop(self):
+        self.protocol.cmd_joystick(0, 0)
 
-    def command_reset(self):
-        self.protocol.send('\xfe')
+    def estop(self):
+        self.protocol.cmd_estop()
 
-    def request_calibration(self):
-        data = '\x41'
-        self.protocol.send(data)
+    def reset(self):
+        self.protocol.cmd_reset()
+
+    def getCalibration(self):
+        self.protocol.req_calibration()
         self.calibration_d = defer.Deferred()
         return self.calibration_d
 
-    def onHandshake(self, data):
+    def _onHandshake(self, data):
         log.msg(system='DriveService', format="Controller is alive")
-        handlers = self.parent.getHandlers('DRV_HANDSHAKE')
-        for h in handlers:
-            h()
+        self.parent.triggerEvent('DRV_HANDSHAKE')
 
-    def onDriveError(self, data):
+    def _onDriveError(self, data):
         log.msg(system='DriveService', format="Controller error, code %(code)#x", code=data[0])
-        handlers = self.parent.getHandlers('DRV_ERROR')
-        for h in handlers:
-            h(data[0])
+        self.parent.triggerEvent('DRV_ERROR', data[0])
 
-    def onReceiveStatus(self, data):
+    def _onReceiveStatus(self, data):
         status = data[0];
         xpos = data[1];
         ypos = data[2];
         xval = data[3];
         yval = data[4];
-        handlers = self.parent.getHandlers('DRV_STATUS')
-        for h in handlers:
-            h(status, xpos, ypos, xval, yval)
+        self.parent.triggerEvent('DRV_STATUS', status, xpos, ypos, xval, yval)
 
-    def onReceiveCalibration(self, data):
+    def _onReceiveCalibration(self, data):
         log.msg(system='DriveService', format="receivied calibration values")
         calibration = {}
         calibration['current_x'] = data[0]

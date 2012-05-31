@@ -3,7 +3,7 @@ from twisted.internet import reactor
 from twisted.internet.serialport import SerialPort
 from twisted.python import log
 
-from azathoth.protocols.controllerprotocol import ControllerProtocol
+from azathoth.protocols.ioprotocol import IoProtocol
 from azathoth.devices.lcd import Lcd
 
 class IoService(service.Service):
@@ -14,7 +14,7 @@ class IoService(service.Service):
     
     def startService(self):
         log.msg(system='IoService', format="service starting")
-        self.protocol = ControllerProtocol(self)
+        self.protocol = IoProtocol(self)
         log.msg(system='IoService', format="opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
         self.lcd = Lcd(self)

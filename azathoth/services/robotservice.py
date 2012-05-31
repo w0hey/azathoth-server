@@ -11,6 +11,7 @@ class RobotService(service.MultiService):
         self.top_service = top_service
         service.MultiService.__init__(self)
         self.handlers = defaultdict(list)
+        self.hId = 1
 
     def startService(self):
         log.msg(system='RobotService', format="service starting")
@@ -25,18 +26,19 @@ class RobotService(service.MultiService):
         service.MultiService.stopService(self)
 
     def addHandler(self, event, handler):
-        # this is sub-optimal, because we have no real way
-        # to remove a handler once it's added.
-        self.handlers[event].append(handler)
+        id = self.hId
+        self.handlers[event].append((id, handler))
+        self.hId = self.hId + 1
+        return id
 
-    def delHandler(self, event):
-        #TODO
-        pass
+    def delHandler(self, event, id):
+        for h in self.handlers[event]:
+            if h[0] == id:
+                del h
 
-    def getHandlers(self, event):
-        # Hey look, I found a way to make this even less elegant!
-        # this returns a list of handlers to be called for a given event
-        # calling those handlers with appropriate arguments is up to the
-        # emitter of the event
-        return self.handlers[event]
-
+    def triggerEvent(self, event, *args):
+        if event in self.handlers:
+            for h in self.handlers[event]:
+                h[1](*args)
+        else:
+            return

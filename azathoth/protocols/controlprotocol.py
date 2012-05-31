@@ -7,17 +7,18 @@ class ControlProtocol(NetstringReceiver):
         log.msg("Got connection")
         self.factory.clients.append(self)
         self.robot = self.factory.robot
-        self.robot.addHandler('DRV_STATUS', self.send_status)
+        self.statusHandler = self.robot.addHandler('DRV_STATUS', self.send_status)
 
     def connectionLost(self, reason):
         log.msg(format="Lost connection, reason: %(reason)s", reason=reason.getErrorMessage())
+        self.robot.delHandler('DRV_STATUS', self.statusHandler)
         self.factory.clients.remove(self)
 
     def stringReceived(self, string):
         log.msg(format="String received: %(string)s", string=string)
         if string[0] == 'c':
             # calibration value request
-            d = self.robot.drive.request_calibration()
+            d = self.robot.drive.getCalibration()
             d.addCallback(self.send_calibration)
 
         elif string[0] == 'C':
@@ -25,36 +26,36 @@ class ControlProtocol(NetstringReceiver):
             log.msg("got calibration command")
             x = ord(string[1])
             y = ord(string[2])
-            self.robot.drive.command_calibrate(x, y)
+            self.robot.drive.setCalibration(x, y)
 
         elif string[0] == 'J':
             # Joystick position command
             xpos = ord(string[1])
             ypos = ord(string[2])
-            self.robot.drive.command_joystick(xpos, ypos)
+            self.robot.drive.directJoystick(xpos, ypos)
 
         elif string[0] == 'D':
             # Drive select command
             if string[1] == '\x00':
-                self.robot.drive.command_select(False)
+                self.robot.drive.driveSelect(False)
             elif string[1] == '\x01':
-                self.robot.drive.command_select(True)
+                self.robot.drive.driveSelect(True)
 
         elif string[0] == 'E':
             # E-stop
-            self.robot.drive.command_estop()
+            self.robot.drive.estop()
 
         elif string[0] == 'R':
             # Reset E-stop
-            self.robot.drive.command_reset()
+            self.robot.drive.reset()
         
         elif string[0] == 'S':
             # soft stop command
-            self.robot.drive.command_softstop()
+            self.robot.drive.stop()
 
         elif string[0] == 'W':
             # calibration store command
-            self.robot.drive.command_store_calibration()
+            self.robot.drive.storeCalibration()
         
     def send_calibration(self, d):
         log.msg(system="ControlProtocol", format="send_calibration, data=%(data)s", data=d)

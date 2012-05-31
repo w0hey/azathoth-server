@@ -1,35 +1,70 @@
 from twisted.python import log
 
-from azathoth.protocols.linkprotocol import LinkProtocol
+from azathoth.protocols.controllerprotocol import ControllerProtocol
 
-class DriveProtocol(LinkProtocol):
+class DriveProtocol(ControllerProtocol):
     def __init__(self, service):
-        self.service = service
-        self.callbacks = {}
-        LinkProtocol.__init__(self)
+        ControllerProtocol.__init__(self, service)
 
-    def register_callback(self, cmd, callback):
-        self.callbacks[cmd] = callback
+    def cmd_mode(self, mode):
+        """Change the drive mode. Mode:
+        0x00: Local "Wheelchair" mode.
+        0x01: Remote "Robot" mode.
+        """
 
-    def unregister_callback(self, cmd):
-        del self.callbacks[cmd]
+    def cmd_joystick(self, xpos, ypos):
+        """
+        Command movement by directly simulating a joystick position
+        xpos, ypos: the commanded position as a signed value relative to center
+        """
+        data = '\x30' + chr(xpos) + chr(ypos)
+        self.send(data)
+        
+    def cmd_calibrate_set(self, xvalue, yvalue):
+        """
+        Set the drive controller's joystick center position
+        xvalue, yvalue: new center position, raw PWM values
+        """
+        data = '\x40\x00' + chr(xvalue) + chr(yvalue)
+        self.send(data)
+    
+    def cmd_calibrate_store(self):
+        """
+        Writes the current calibration values to the drive controller's
+        EEPROM
+        """
+        data = '\x40\x10'
+        self.send(data)
 
-    def handle_packet(self, packet):
-        # let's fix this data here and now.
-        data = map(ord, packet)
-        log.msg(system='DriveProtocol', format="Got packet: %(data)s", data=map(hex,data))
-        cmd = data[0]
-        if cmd in self.callbacks:
-            self.callbacks[cmd](data[1:])
+    def cmd_driveselect(self, enable):
+        """
+        Enables/disables "remote" control of the drive system
+        enable: True - Electronics have control. False - Onboard joystick
+        has control.
+        """
+        if enable:
+            data = '\x43\x01'
         else:
-            log.msg(system='DriveProtocol', format="No callback for command: %(cmd)s", cmd=cmd)
-        #if packet[0] == '\x41':
-            # calibration response
-        #    x_cur = ord(packet[1])
-        #    y_cur = ord(packet[2])
-        #    x_eeprom = ord(packet[3])
-        #    y_eeprom = ord(packet[4])
-        #    self.service.receive_calibration(x_cur, y_cur, x_eeprom, y_eeprom)
+            data = '\x43\x00'
+        self.send(data)
 
-    def handle_badframe(self, data):
-        log.err(system='DriveProtocol', format="bad frame received: %(data)s", data=map(hex,map(ord,data)))
+    def cmd_reset(self):
+        """
+        Instructs the controller to pull in the e-stop relay,
+        resetting the emergency stop
+        """
+        self.send('\xfe')
+
+    def cmd_estop(self):
+        """
+        Instructs the controller to release the e-stop relay,
+        causing an emergency stop
+        """
+        self.send('\xff')
+
+    def req_calibration(self):
+        """
+        Asks the drive controller to send its current calibration
+        values. Will result in a 0x41 response
+        """
+        self.send('\x41')

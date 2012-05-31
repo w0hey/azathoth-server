@@ -2,7 +2,7 @@ from twisted.python import log
 
 from azathoth.protocols.linkprotocol import LinkProtocol
 
-class ControllerProtocol
+class ControllerProtocol(LinkProtocol):
     def __init__(self, service):
         self.service = service
         self.callbacks = {}
@@ -26,4 +26,4 @@ class ControllerProtocol
 
     def handle_badframe(self, data):
         #TODO: log/raise error, whatever
-        
+        pass

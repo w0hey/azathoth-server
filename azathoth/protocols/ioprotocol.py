@@ -1,28 +1,50 @@
 from twisted.python import log
 
-from azathoth.protocols.linkprotocol import LinkProtocol
+from azathoth.protocols.controllerprotocol import ControllerProtocol
 
-class IoProtocol(LinkProtocol):
+class IoProtocol(ControllerProtocol):
     def __init__(self, service):
-        self.service = service
-        self.callbacks = {}
-        LinkProtocol.__init__(self)
+        ControllerProtocol.__init__(self, service)
 
-    def register_callback(self, cmd, callback):
-        self.callbacks[cmd] = callback
+    def lcd_cmd_clear(self):
+        """
+        Clear the LCD screen
+        """
+        data = '\x03\x00'
+        self.send(data)
 
-    def unregister_callback(self, packet):
-        del self.callbacks[cmd]
-
-    def handle_packet(self, packet):
-        data = map(ord, packet)
-        log.msg(system='IoProtocol', format="Got packet: %(data)s", data=map(hex,data))
-        cmd = data[0]
-        if cmd in self.callbacks:
-            self.callbacks[cmd](data[1:])
+    def lcd_cmd_set_enabled(self, enabled):
+        """
+        Enable/disable the lcd display
+        Does not affect the backlight
+        """
+        if enabled:
+            data = '\x03\x01\x01'
         else:
-            log.msg(system='IoProtocol', format="No callback for command: %(cmd)s", cmd=cmd)
+            data = '\x03\x01\x00'
+        self.send(data)
 
-    def handle_badframe(self, data):
-        log.err(system="IoProtocol", format="bad frame received: %(data)s", data=data)
+    def lcd_cmd_set_backlight(self, value):
+        """
+        Set the LCD backlight brightness
+        Value: See serial LCD datasheet
+        """
+        # TODO: Interpret the value in some usable way
+        data = '\x03\x02' + chr(value)
+        self.send(data)
 
+    def lcd_cmd_set_position(self, line, column):
+        """
+        Move the LCD cursor to a new position
+        line: 0-1
+        column: 0-15
+        """
+        data = '\x03\x03' + chr(line) + chr(column)
+        self.send(data)
+
+    def lcd_cmd_write(self, chars):
+        """
+        Write the provided characters to the LCD
+        """
+        data = '\x03\x04' + chars
+        self.send(data)
