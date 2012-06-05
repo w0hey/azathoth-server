@@ -26,17 +26,36 @@ class RobotService(service.MultiService):
         service.MultiService.stopService(self)
 
     def addHandler(self, event, handler):
+        """register an event handler
+
+        event -- a string naming the event to handle
+        handler -- a function to call when this event fires
+
+        returns an integer handler id which can be used
+        to unregister the event
+        """
         id = self.hId
         self.handlers[event].append((id, handler))
         self.hId = self.hId + 1
         return id
 
     def delHandler(self, event, id):
+        """deregister an event handler
+
+        event -- a string naming the event this handler is watching
+        id -- the integer id of the handler to remove
+        """
         for h in self.handlers[event]:
             if h[0] == id:
                 del h
 
     def triggerEvent(self, event, *args):
+        """fire event handlers for a given event
+
+        event -- a string naming the event to fire
+        
+        all remaining arguments are passed to the event handler
+        """
         if event in self.handlers:
             for h in self.handlers[event]:
                 h[1](*args)
