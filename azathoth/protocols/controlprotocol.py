@@ -8,10 +8,12 @@ class ControlProtocol(NetstringReceiver):
         self.factory.clients.append(self)
         self.robot = self.factory.robot
         self.statusHandler = self.robot.addHandler('DRV_STATUS', self.send_status)
+        self.sonarHandler = self.robot.addHandler('SONAR_RANGE', self.send_sonar)
 
     def connectionLost(self, reason):
         log.msg(format="Lost connection, reason: %(reason)s", reason=reason.getErrorMessage())
         self.robot.delHandler('DRV_STATUS', self.statusHandler)
+        self.robot.delHandler('SONAR_RANGE', self.sonarHandler)
         self.factory.clients.remove(self)
 
     def stringReceived(self, string):
@@ -68,6 +70,10 @@ class ControlProtocol(NetstringReceiver):
 
     def send_status(self, status, xpos, ypos, xvalue, yvalue):
         data = 's' + chr(status) + chr(xpos) + chr(ypos) +chr(xvalue) + chr(yvalue)
+        self.sendString(data)
+
+    def send_sonar(self, sonar_range):
+        data = 'r' + chr(sonar_range)
         self.sendString(data)
 
     def send_error(self, source, error):
