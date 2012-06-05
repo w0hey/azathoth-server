@@ -16,11 +16,10 @@ class LinkProtocol(protocol.Protocol):
         self._frame = None
 
     def dataReceived(self, data):
-        #log.msg("dataReceived: " + data)
         for c in data:
             if (self._frame and c == LinkFrame.START_BYTE):
                 # Bad frame, restart
-                log.err(system='LinkProtocol', format="Unexpected start byte")
+                log.msg(system='LinkProtocol', format="Unexpected start byte")
                 self.handle_badframe(self._frame.raw_data)
                 self._frame = None
             if self._frame:

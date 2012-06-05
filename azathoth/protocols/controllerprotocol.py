@@ -3,6 +3,7 @@ from twisted.python import log
 from azathoth.protocols.linkprotocol import LinkProtocol
 
 class ControllerProtocol(LinkProtocol):
+
     def __init__(self, service):
         self.service = service
         self.callbacks = {}
