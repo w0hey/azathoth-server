@@ -5,6 +5,7 @@ from twisted.python import log
 
 from azathoth.protocols.ioprotocol import IoProtocol
 from azathoth.devices.lcd import Lcd
+from azathoth.devices.sonar import Sonar
 
 class IoService(service.Service):
     name = "ioservice"
@@ -18,6 +19,7 @@ class IoService(service.Service):
         log.msg(system='IoService', format="opening serial port %(port)s", port=self.port)
         self.serial = SerialPort(self.protocol, self.port, reactor, baudrate=self.speed)
         self.lcd = Lcd(self)
+        self.sonar = Sonar(self)
         self.protocol.register_callback(0x01, self.onHandshake)
         self.protocol.register_callback(0xee, self.onIoError)
         service.Service.startService(self)
