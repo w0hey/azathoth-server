@@ -20,6 +20,7 @@ class RobotService(service.MultiService):
         self.io = self.getServiceNamed('ioservice')
         self.controlservice = self.top_service.getServiceNamed('controlservice')
         self.shellservice = self.top_service.getServiceNamed('shellservice')
+        self.initHandler = self.addHandler('IO_HANDSHAKE', self.onInit)
 
     def stopService(self):
         log.msg(system='RobotService', format="service stopping")
@@ -61,3 +62,12 @@ class RobotService(service.MultiService):
                 h[1](*args)
         else:
             return
+
+    def onInit(self):
+        self.io.lcd.clear()
+        self.io.lcd.setPos(0, 0)
+        self.io.lcd.writeChars("Ready")
+        from azathoth.getip import *
+        ip = getIpAddress('wlan0')
+        self.io.lcd.setPos(1, 0)
+        self.io.lcd.writeChars(ip)

@@ -31,7 +31,9 @@ class IoService(service.Service):
 
     def onHandshake(self, data):
         log.msg(system='IoService', format="Controller is alive") 
+        self.parent.triggerEvent('IO_HANDSHAKE')
 
     def onIoError(self, data):
         log.msg(system='IoService', format="Controller error, code %(code)#x", code=data[0])
+        self.parent.triggerEvent('IO_ERROR', data[0])
 
