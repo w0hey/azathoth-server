@@ -27,6 +27,9 @@ class TelnetProtocol(telnet.Telnet):
         if line == "lcd":
             self.write("lcd > ")
             return "Lcd"
+        if line == "drive":
+            self.write("drive >")
+            return "Drive"
         if line == "exit":
             self.transport.loseConnection()
         if line == "kill":
@@ -46,6 +49,19 @@ class TelnetProtocol(telnet.Telnet):
             self.write("clear exit\r\n")
         self.write("lcd > ")
         return "Lcd"
+
+    def telnet_Drive(self, line):
+        if line == "exit":
+            self.write("> ")
+            return "Command"
+        if line == "enable":
+            self.factory.robot.drive.driveSelect(True)
+        if line == "disable":
+            self.factory.robot.drive.driveSelect(False)
+        else:
+            self.write("disable enable exit\r\n")
+        self.write("drive > ")
+        return "Drive"
     
     def logPrefix(self):
         return "TelnetProtocol"
