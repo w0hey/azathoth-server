@@ -73,7 +73,7 @@ class ControlProtocol(NetstringReceiver):
         self.sendString(data)
 
     def send_sonar(self, sonar_range):
-        data = 'r' + chr(sonar_range)
+        #data = 'r' + chr(sonar_range)
         self.sendString(data)
 
     def send_error(self, source, error):
