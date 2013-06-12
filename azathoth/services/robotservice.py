@@ -10,6 +10,13 @@ class RobotService(service.MultiService):
     def __init__(self, top_service):
         self.top_service = top_service
         service.MultiService.__init__(self)
+        
+        # define the structure of event handler entries:
+        # each entry in the the dict is keyed by event ID, and
+        # its value is a list of (id, function) tuples.
+        # this is probably wrong in a variety of ways, especially
+        # as it requires knowing both the handled event and the registered
+        # handler ID in order to reference or deregister a registered handler
         self.handlers = defaultdict(list)
         self.hId = 1
 
@@ -38,6 +45,10 @@ class RobotService(service.MultiService):
         id = self.hId
         self.handlers[event].append((id, handler))
         self.hId = self.hId + 1
+        
+        log.msg(system='RobotService', format="added handler for event %(ev)s, \ 
+        id %(i)d handler: %(h)s", ev=event, i=id, h=str(handler))
+        
         return id
 
     def delHandler(self, event, id):
@@ -69,5 +80,6 @@ class RobotService(service.MultiService):
         self.io.lcd.writeChars("Ready")
         from azathoth.getip import *
         ip = getIpAddress('wlan0')
+        log.msg(system='RobotService', format="found wlan0 ip address: %(i)s", i=ip)
         self.io.lcd.setPos(1, 0)
         self.io.lcd.writeChars(ip)
