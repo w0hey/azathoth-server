@@ -2,6 +2,11 @@ from twisted.python import log
 
 from azathoth.protocols.linkprotocol import LinkProtocol
 
+# driveprotocol and ioprotocol are subclasses of
+# controllerprotocol which is a subclass of LinkProtocol,
+# and DriveService and IOService are basically thin abstractions
+# of driveprotocol and ioprotocol, respectively. I hate this codebase.
+
 class ControllerProtocol(LinkProtocol):
 
     def __init__(self, service):
