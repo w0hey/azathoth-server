@@ -11,9 +11,9 @@ class Options(usage.Options):
                       "The port number to listen on."],
                      ["telnetport", "t", DEFAULT_TELNETPORT,
                       "The port number to bind the telnet shell server to."],
-                     ["drive", "d", DEFAULT_DRIVEDEVICE,
+                     ["drivedevice", "d", DEFAULT_DRIVEDEVICE,
                       "The serial port connected to the drive controller"],
-                     ["io", "i", DEFAULT_IODEVICE,
+                     ["iodevice", "i", DEFAULT_IODEVICE,
                       "The serial port connected to the IO controller"]
                      ]
 

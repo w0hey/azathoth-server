@@ -14,10 +14,10 @@ def makeService(options):
     robot_service = RobotService(top_service)
     robot_service.setServiceParent(top_service)
 
-    drive_service = DriveService(options['drive'], 115200)
+    drive_service = DriveService(options['drivedevice'], 115200)
     drive_service.setServiceParent(robot_service)
 
-    io_service = IoService(options['io'], 115200)
+    io_service = IoService(options['iodevice'], 115200)
     io_service.setServiceParent(robot_service)
 
     shell_factory = ShellFactory(top_service)
