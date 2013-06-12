@@ -53,13 +53,6 @@ class LinkProtocol(protocol.Protocol):
         """
         pass
 
-    def _write(self, data):
-        # TODO: This method is spurious, in txXBee is overrides
-        # the underlying ZigBee class's _write method.
-        # all this code can safely be added to our send() method.
-        frame = LinkFrame(data).output()
-        self.transport.write(frame)
-
     def _split_response(self, data):
         # TODO: This method is spurious. Unlike python-xbee, we
         # only need to handle one type of data packet (so far).
@@ -71,4 +64,5 @@ class LinkProtocol(protocol.Protocol):
         as a packet and sent over the wire.
         """
         log.msg(system='LinkProtocol', format="Sending frame: %(data)s", data=map(hex,map(ord,list(data)))) #yikes
-        self._write(data)
+        frame = LinkFrame(data).output()
+        self.transport.write(frame)
