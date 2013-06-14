@@ -46,7 +46,7 @@ class RobotService(service.MultiService):
         self.handlers[event].append((id, handler))
         self.hId = self.hId + 1
         
-        log.msg(system='RobotService', format="added handler for event %(ev)s, \ 
+        log.msg(system='RobotService', format="added handler for event %(ev)s, \
         id %(i)d handler: %(h)s", ev=event, i=id, h=str(handler))
         
         return id
