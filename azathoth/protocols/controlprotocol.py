@@ -7,6 +7,10 @@ class ControlProtocol(NetstringReceiver):
         log.msg("Got connection")
         self.factory.clients.append(self)
         self.robot = self.factory.robot
+        # TODO: Why the hell is this here? it must have seemed
+        # like a good idea at the time, but the protocol should
+        # *not* be involved in the decision to send data, only in
+        # the actual sending of it.
         self.statusHandler = self.robot.addHandler('DRV_STATUS', self.send_status)
         self.sonarHandler = self.robot.addHandler('SONAR_RANGE', self.send_sonar)
 
@@ -25,7 +29,6 @@ class ControlProtocol(NetstringReceiver):
 
         elif string[0] == 'C':
             # calibration set command
-            log.msg("got calibration command")
             x = ord(string[1])
             y = ord(string[2])
             self.robot.drive.setCalibration(x, y)
