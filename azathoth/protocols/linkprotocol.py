@@ -17,24 +17,39 @@ class LinkProtocol(protocol.Protocol):
 
     def dataReceived(self, data):
         for c in data:
+            # this is, essentially, a state machine. Unfortunately,
+            # a decent amount of it's logic is actually in the
+            # LinkFrame itself.
             if (self._frame and c == LinkFrame.START_BYTE):
-                # Bad frame, restart
+                # We're already in a frame, but we got a start byte,
+                # something got trashed.
                 log.msg(system='LinkProtocol', format="Unexpected start byte")
                 self.handle_badframe(self._frame.raw_data)
                 self._frame = None
             if self._frame:
+                # We are in a frame, add this byte to it
                 self._frame.fill(c)
                 if self._frame.remaining_bytes() == 0:
+                    # We're at the last byte, according to the frame's length
+                    # field
                     try:
                         # try to parse and return result
                         self._frame.parse()
                         self.handle_packet(self._split_response(self._frame.data))
                     except ValueError:
-                        # Bad frame, restart
+                        # Any number of things could have gone wrong,
+                        # it'd be nice to know what, but fuckit,
+                        # let's hand the error up a level and start over!
+                        # most likely this means we tried to parse() a frame
+                        # before receiving it's full header, which shouldn't
+                        # happen.
                         self.handle_badframe(self._frame.raw_data)
                     self._frame = None
             else:
                 if c == LinkFrame.START_BYTE:
+                    # This is the start of a new frame, so
+                    # create a LinkFrame to hold it and start
+                    # packing it in.
                     self._frame = LinkFrame()
                     self._frame.fill(c)
 
@@ -64,5 +79,6 @@ class LinkProtocol(protocol.Protocol):
         as a packet and sent over the wire.
         """
         log.msg(system='LinkProtocol', format="Sending frame: %(data)s", data=map(hex,map(ord,list(data)))) #yikes
+        # If this were python3, the preceding line would be even worse.
         frame = LinkFrame(data).output()
         self.transport.write(frame)
