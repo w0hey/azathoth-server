@@ -1,5 +1,6 @@
 /twisted/plugins/dropin.cache
 *.py[co]
+.build
 
 # Packages
 *.egg
