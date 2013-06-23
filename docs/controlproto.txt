@@ -1,0 +1,300 @@
+Existing protocol-ish:
+
+client->server
+['c'] - calibration value request
+
+['C', x, y] - calibration set command
+	x, y - calibration offsets
+
+['J', x, y] - drive vector command (joystick command)
+	x, y - wheelchair joystick postion to emulate
+
+['D', select] - drive select command
+	select - 1 to connect the arduino to the wheelchair controller
+		 2 to connect the onboard joystick to the controller
+
+['E'] - E-stop command - instruct drive control to perform sequenced E-stop
+
+['R'] - R-stop reset command - instruct drive control to reset from E-stop
+condition
+
+['S'] - soft-stop command - instruct drive control to return emulated joystick
+to neutral, stopping the robot normally.
+
+['W'] - calibration eeprom write - instruct drive control to burn current
+calibration offsets into onboard EEPROM
+
+server->client
+['c', x, y, ex, ey] - calibration value data
+	x, y - current x and y calibration offsets
+	ex, ey - calibration offsets read from onboard EEPROM
+
+['s', status, xpos, ypos, xval, yval] - drive status data - FIXME
+	status - drive status bitfield. Documentation will take a while to dig
+	up.
+	xpos, ypos - current emulated joystick position (signed?)
+	xval, yval - current raw PWM values being fed to the wheelchair's
+	joystick inputs?
+
+['r', range] - sonar range value
+	range - sonar echo distance in inches? Hasn't been used yet
+
+
+New protocol:
+
+ * General format
+ 	Messages are (for now) in netstring format.
+ 	Messages in either direction start with a byte (or string?
+	eventually?) identifying the subsystem targeted by or orginating the
+	message. An incomplete, in progress, listing of these identifiers
+	follows. Note that the prefix character is an ASCII letter, and chosen
+	to have at least some mnemonic value.
+
+	C - ControlProtocol/Connection commands (Dear god I just realized I
+	should be alphabetizing these), commands for disconnecting the control
+	connection, querying it's status, or changing it's parameters
+
+	D - The driveservice, handling motion of the robot
+	
+	H - Host/hardware; commands generally relating to the functioning of
+	the overall Linux environment running the server
+
+	I - The ioservice, handling all sensors and other hardware and
+	electronics not directly interfaced to the Beagleboard. General
+	commands, mostly (only?) with specific identifiers for specific
+	devices
+
+	L - The onboard 16x2 LCD display, interfaced via IOService
+
+	N - Noise. Commands which control the robot's audio devices, which
+	currently include the BeagleBoard's own audio device (with no speakers
+	connected...) and a Sparkfun speech synthesiser board (not connected
+	to anything at all...)
+
+	P - Power system, for getting information about power supplies,
+	battery status, controlling power distribution (eventually)
+
+	R - Robotservice itself. High-level commands. Purpose unknown.
+
+	S - The sonar ranging system, interfaced via IOService
+
+	V - Video system, for controlling the live video streaming subsystem
+
+	After the first byte, the message is guaranteed to have at least one
+	more byte, which should have meaning to the specific subsystem
+	identified by the first byte. Upon reading the first byte, the entire
+	message will be handed off to the identified subsystem for futher
+	processing.
+
+* Message types
+	
+	Currently, there are three known message types, which are only
+	distinguised from each other by the way they are generated and
+	handled. These are command messages, response messages, and
+	unsolicited response messages.
+
+	Command messages are sent from the client to the robot, and either
+	cause some direct effect on its operation, or cause the robot to
+	return an appropirate response message, generally providing some data
+	that the command message requested.
+
+	Response messages are sent from the robot to the client, begin with
+	the ID prefix for the subsystem generating the message, and may be a
+	simple ackknowledgement of a new state, or may contain information
+	about a particular aspect of the subsystem's current operation
+
+	Unsolicited response messages should be essentially identical to a
+	standard reponse message, and should be handled by the client in the
+	exact same way, but may be sent without being explicitly requested.
+	These can be used to update the client with important or time-critical
+	information about the robot's status and operation.
+
+* Specific Subsytem messages
+
+	- Connection/Controlprotocol
+		Messages for this subsystem will either have some direct
+		effect on the connection between control client and robot, or
+		will result in the robot returning information about the
+		connection to the client.
+
+		CH - Handshake message
+			The client must send this message after establishing a
+			connection, and the robot must not respond to any
+			other commands until it has been received. This
+			provides a layer of defense against inadvertant
+			connections by other network applications causing
+			undesired operation.  Eventually this may be replace
+			with some form of real authentication. The robot will
+			reply to the client with a matching CH as
+			acknowledgement.
+
+		CD - Disconnect
+			The client sends this message to indicate that it is
+			closing the connection.
+
+		CK - Kill others
+			Not to be confused with the driveservice's Kill All
+			Humans command (pending development) this command
+			should cause the robot to disconnect all client
+			connections *except* the one issuing this command.
+			Useful in case of any network trouble which leaves a
+			client connection open.
+	
+	- Drive Service
+		The fun part! Messages for this subsystem will, mostly, cause
+		the robot to move, stop moving, spin in circles, tear it's
+		debugging cables out of my USB ports, move furniture around,
+		and/or damage random property.
+
+			D! - Pronounced "de-bang" this command is useful for
+			preventing all sorts of unexpected loud noises, by
+			causing the robot's drive controller to perform a
+			sequenced emergency stop. The robot will (if it feels
+			like it) send a drive status response as confirmation
+			of this command. It is highly recommended to send this
+			command again if it is not acknowledged. In fact, just
+			send it 3 times in a row regardless. Seriously, the
+			robot weighs like 300lbs and doesn't like you.
+
+			DCR - Calibration value request. Drive controller
+			replies with its current active and EEPROM-stored
+			calibration parameters.
+
+			DCS[x, y] - Calibration command. Sets center position
+			of the fake joystick signals fed into the wheelchair
+			controller. X and Y are the desired PWM values,
+			encoded as single bytes.
+
+			DCW - Calibration write command. Causes the drive
+			controller to store the currently active calibration
+			offsets into its onboard EEPROM.
+
+			DM[mode] - Mode command. Determines whether the
+			wheelchair controller gets commannds from the drive
+			controller, or from the onboard joystick.
+			[mode] - R to select drive controller, M to select
+			onboard joystick.
+
+			DR - Reset. After receiving an E-stop (D!) command,
+			the robot should refuse any movement commands until
+			the drive controller has been returned to normal
+			operation by this reset command.
+
+			DS - Status request. Query the current drive
+			controller parameters. The drive controller will reply
+			with a drive status message.
+
+			DZR - Controller reset. Force a hardware reset of the
+			drive controller.
+	
+	- Host/Hardware
+		Various commands for controlling and querying the
+		Beagleboard's onboard hardware and software go here.
+
+		So far, I haven't thought of any.
+
+	- IoService
+		Commands for controlling and querying the IoService itself.
+
+			IZR - Controller reset. Force a hardware reset of the
+			IO controller
+	
+	- LCD
+		Oh boy, this is going to be a mess. I never implemented any of
+		exposed any of the LCD functions to the old controlprotocol,
+		and I'm not even really sure I need to, but here goes. I'm not
+		really sure how remote control of the LCD will interact with
+		whatever onboard processes might be wishing to use the LCD at
+		the same time. I suppose we'll try... multiple LCD buffers,
+		with a mode select command to decide which buffer the LCD
+		should be trying to display.
+
+			LC - Clear the display. I think this also returns the
+			cursor to 0,0, but who knows. No reading datasheets
+			tonight.
+
+			LE[1,0] - Enable/disable display. 1 to enable, 0 to
+			disable. I think disabling just blanks the display,
+			and enabling restores it. It may ignore writes while
+			disabled, but I don't recall. Again, no reading
+			datasheets.
+
+			LL[value] - Set backlight level. Value is a single
+			byte. There's some funky range of values the the
+			serial LCD module expects, for which I will,
+			regrettably, have to check the datasheet.
+
+			LM[mode] - Set LCD mode. Let's say that the mode that
+			allows the commands in this section to write to the
+			screen is mode... X. Why not. The other mode, where
+			RobotService uses the screen as it pleases, is mode A.
+
+			LP[line, column] - Set cursor position. Line is a
+			single byte, either 0x00 or 0x01, to indicate the
+			desired line. Column is a single byte from 0x00 to
+			0x0E indicating the desired column.
+
+			LW[...] - Write characters to the screen. Whatever
+			bytes follow the command will be (maybe) checked for
+			sanity, then interpreted as ASCII characters and
+			written to the screen at the current cursor position.
+	
+	- Noise
+		None of this is implemented in hardware or software, but I
+		should be ready for it anyway. For now, we'll define one
+		command:
+
+			NN - Make some goddamn noise. Might play a beep,
+			chime, sound effect, whatever. If the robot needs to
+			provide an audible cue, this is the command to use.
+			For now.
+	
+	- Power
+		I really need to get this implemented in hardware. These
+		commands allow monitoring the batteries, power supplies, power
+		distribution system, and other stuff capable of randomly
+		spitting sparks and generating bad odors.
+
+			PBS - Request battery system status. Returns a message
+			containing (at least) the overall voltage of the
+			batteru pack. Exact implementation of this response
+			messages is undefined.
+	
+	- RobotService
+		Commands affecting the high-level RobotService, essentially
+		controlling the control server as a whole.
+			
+			RK - Kill. Stop the robotservice, terminating the
+			server.
+	
+	- Sonar Ranging
+		Commands for controlling and monitoring the sonar ranging
+		sensor system
+			
+			SE - Enable the sonar sensor, causing it to take
+			repeated range measurements and send them to the
+			IOService unsolicited
+
+			SD - Disable the sonar sensor. No range updates will
+			be sent.
+
+			SP - Single ping. The sonar sensor will take one range
+			measurement and send the value to the IOService
+	
+	- Video transmission
+		Start/stop and configure the onboard video streaming system.
+
+			VE[(ip), (port), (res)] - Activate the webcam and begin
+			realtime video streaming. IP is the IP address of the
+			machine to send video to, and port is the listening
+			port on that machine. res is the desired horizontal
+			component of the desired resolution. 640 for native
+			640x480 resolution, 320 for 320x240, etc. All
+			parameters are strings, separated by commas.
+
+			After bringing up the video streaming system, A VC
+			response will be sent containing the Gstreamer
+			configuration string the client should use to
+			synchronize and decode the stream.
+
+			VS - Cease video streaming
